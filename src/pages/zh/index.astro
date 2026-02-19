@@ -1,0 +1,133 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { SITE, SOCIAL } from '@lib/constants';
+import { t, getLocalePath } from '@i18n/utils';
+
+const strings = t('zh');
+
+const news = [
+  { date: '2026.02', text: '"Time-varying Asset Embeddings in China" 在 Management Science 进入修改重投阶段。' },
+  { date: '2025.08', text: '加入华泰证券，担任量化研究实习生。' },
+  { date: '2025.07', text: '论文 "Time-varying Asset Embeddings in China" 投稿至 Management Science。' },
+  { date: '2023.11', text: '在 arXiv 发布扩散模型采样调度器预印本 (arXiv:2311.06845)。' },
+];
+---
+
+<BaseLayout title={`${SITE.titleZh} — ${strings.home.tagline}`} description={SITE.descriptionZh}>
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="mx-auto max-w-4xl px-4 pb-16 pt-16 md:px-6 md:pb-24 md:pt-24">
+      <div class="flex flex-col gap-10 md:flex-row md:items-center md:gap-16">
+        <div class="flex-1">
+          <p class="animate-fade-in-up mb-3 text-sm font-medium tracking-wide text-accent">
+            中山大学 岭南学院
+          </p>
+          <h1 class="animate-fade-in-up animation-delay-100 mb-4 text-4xl font-bold leading-tight text-text-primary sm:text-5xl lg:text-6xl">
+            {strings.home.greeting}
+          </h1>
+          <p class="animate-fade-in-up animation-delay-200 mb-8 max-w-lg text-lg leading-relaxed text-text-secondary">
+            {strings.home.tagline}
+          </p>
+
+          <!-- Research interest tags -->
+          <div class="animate-fade-in-up animation-delay-300 mb-8 flex flex-wrap gap-2">
+            {['量化金融', '机器学习', '表征学习', '深度生成模型', '金融NLP'].map(tag => (
+              <span class="rounded-full border border-border bg-bg-secondary/50 px-3 py-1 text-xs font-medium text-text-secondary transition-colors hover:border-accent hover:text-accent">
+                {tag}
+              </span>
+            ))}
+          </div>
+
+          <!-- Social links -->
+          <div class="animate-fade-in-up animation-delay-400 flex flex-wrap items-center gap-3">
+            <a
+              href={`mailto:${SOCIAL.email}`}
+              class="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-text-primary transition-all hover:border-accent hover:text-accent"
+            >
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+              </svg>
+              邮箱
+            </a>
+            {SOCIAL.github && (
+              <a
+                href={SOCIAL.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-text-primary transition-all hover:border-accent hover:text-accent"
+              >
+                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                </svg>
+                GitHub
+              </a>
+            )}
+            {SOCIAL.googleScholar && (
+              <a
+                href={SOCIAL.googleScholar}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-text-primary transition-all hover:border-accent hover:text-accent"
+              >
+                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M5.242 13.769L0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z" />
+                </svg>
+                学术主页
+              </a>
+            )}
+          </div>
+        </div>
+
+        <!-- Avatar -->
+        <div class="animate-fade-in-up animation-delay-300 flex shrink-0 justify-center md:justify-end">
+          <div class="relative">
+            <div class="h-44 w-44 overflow-hidden rounded-2xl bg-bg-secondary md:h-52 md:w-52">
+              <img src="/images/avatar.jpg" alt="avatar" class="h-full w-full object-cover" />
+            </div>
+            <div class="absolute -bottom-2 -right-2 h-44 w-44 rounded-2xl border border-accent/20 md:h-52 md:w-52"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Me -->
+  <section class="border-t border-border">
+    <div class="mx-auto max-w-4xl px-4 py-16 md:px-6 md:py-20">
+      <h2 class="mb-6 text-2xl font-bold text-text-primary">
+        {strings.home.aboutTitle}
+      </h2>
+      <div class="max-w-2xl space-y-4 text-text-secondary leading-relaxed">
+        <p>
+          我是<strong class="text-text-primary font-medium">中山大学岭南学院</strong>金融学本科生，辅修统计学（GPA: 3.8/4.0，预计 2026 年 6 月毕业）。
+        </p>
+        <p>
+          我的研究方向处于<strong class="text-text-primary font-medium">量化金融</strong>与<strong class="text-text-primary font-medium">机器学习</strong>的交叉领域，
+          尤其关注金融资产的表征学习、面向因子建模的深度生成模型，以及自然语言处理技术在金融数据中的应用。
+        </p>
+        <p>
+          我曾在华泰证券和申万宏源实习，将深度学习方法应用于资产定价和截面收益率预测。我也参与了国家级 MindDFT 人工智能科学计算平台的开发。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- News -->
+  <section class="border-t border-border">
+    <div class="mx-auto max-w-4xl px-4 py-16 md:px-6 md:py-20">
+      <h2 class="mb-8 text-2xl font-bold text-text-primary">
+        {strings.home.news}
+      </h2>
+      <ul class="space-y-4">
+        {news.map(item => (
+          <li class="flex gap-4">
+            <span class="shrink-0 pt-0.5 text-sm font-mono font-medium text-accent">
+              {item.date}
+            </span>
+            <span class="text-text-secondary">{item.text}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
