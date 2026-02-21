@@ -1,0 +1,165 @@
+---
+import PageLayout from '@layouts/PageLayout.astro';
+import ExperienceTimeline from '@components/ExperienceTimeline.astro';
+import { t } from '@i18n/utils';
+
+const locale = 'zh';
+const strings = t(locale);
+
+const courses = [
+  '实分析',
+  '随机过程 (99)',
+  '经济金融中的机器学习 (97)',
+  '金融工程 (95)',
+  '计量经济学 (90)',
+  '概率论与数理统计',
+  '线性代数',
+  '微分方程',
+  'Python 数据分析',
+];
+
+const honors = [
+  '全国前十名 — 清华大学"金经乐道"经济分析大赛',
+  '队长 — 瑞银金融精英挑战赛',
+];
+
+const experience = [
+  {
+    title: '量化研究实习生',
+    organization: '华泰证券',
+    location: '中国（远程）',
+    period: '2025.08–2025.10',
+    highlights: [
+      '基于"中国市场资产嵌入"研究实现资产表征学习框架，建模资产间关系；完成包括数据预处理、季度嵌入模型训练、回测和内部研究环境部署在内的端到端流水线。',
+      '对嵌入表征进行截面分析，揭示行业轮动趋势、基金风格漂移和风险收益不对称性；向高管汇报研究结果以支持投资组合配置。',
+    ],
+  },
+  {
+    title: '量化研究实习生',
+    organization: '申万宏源集团',
+    location: '上海，中国',
+    period: '2024.07–2024.09',
+    highlights: [
+      '复现并扩展 Duan 等人的 FactorVAE 模型用于截面收益率预测；该工作直接启发了本科毕业论文 AttnFactorVAE 的开发。',
+      '支持每周投资策略研究，整合机构报告洞察，识别宏观主题和行业轮动，为投资组合经理的战术配置提供参考。',
+    ],
+  },
+];
+
+const skills = [
+  {
+    category: '编程',
+    items: ['Python', 'PyTorch', 'TensorFlow', 'Pandas', 'NumPy', 'Scikit-Learn', 'SQL', 'Git', 'C', 'Lua'],
+  },
+  {
+    category: '机器学习',
+    items: ['VAE', 'Attention / Transformers', 'GRU / LSTM', '扩散模型', '监督学习', '降维', '表示学习'],
+  },
+  {
+    category: '金融',
+    items: ['因子模型', '投资组合优化', '回测', '计量经济学', '金融计量经济学'],
+  },
+  {
+    category: '语言',
+    items: ['普通话（母语）', '英语（托福 106）'],
+  },
+];
+---
+
+<PageLayout
+  title={strings.experience.title}
+  description="程子桐的教育背景、专业经验和技能。"
+>
+  <!-- Education -->
+  <section data-animate class="mb-16">
+    <h2 class="mb-6 text-2xl font-bold text-text-primary">
+      {strings.experience.education}
+    </h2>
+    <article class="rounded-xl border border-border p-6">
+      <!-- Header -->
+      <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-start">
+        <div>
+          <h3 class="text-lg font-semibold text-text-primary">
+            中山大学 岭南学院
+          </h3>
+          <p class="mt-1 text-sm text-text-secondary">
+            金融学经济学学士，辅修统计学
+          </p>
+        </div>
+        <div class="shrink-0 text-sm text-text-secondary sm:text-right">
+          <p>广州，中国</p>
+          <p>2022 – 2026（预计）</p>
+        </div>
+      </div>
+
+      <!-- GPA -->
+      <div class="mt-5 flex items-baseline gap-2">
+        <span class="text-3xl font-bold text-accent">3.8</span>
+        <span class="text-lg text-text-secondary">/4.0</span>
+        <span class="ml-1 text-sm font-medium text-text-secondary">GPA</span>
+      </div>
+
+      <!-- Core Courses -->
+      <div class="mt-6">
+        <h4 class="mb-3 text-sm font-semibold uppercase tracking-wider text-text-secondary">
+          {strings.experience.coreCourses}
+        </h4>
+        <div class="flex flex-wrap gap-2">
+          {courses.map(course => (
+            <span class="rounded-full border border-border bg-bg-secondary/50 px-3 py-1 text-xs font-medium text-text-secondary transition-colors hover:border-accent hover:text-accent">
+              {course}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <!-- Honors -->
+      <div class="mt-6">
+        <h4 class="mb-3 text-sm font-semibold uppercase tracking-wider text-text-secondary">
+          {strings.experience.honors}
+        </h4>
+        <ul class="space-y-2">
+          {honors.map(honor => (
+            <li class="flex items-start gap-2 text-sm text-text-secondary">
+              <svg class="mt-0.5 h-4 w-4 shrink-0 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+              {honor}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </article>
+  </section>
+
+  <!-- Professional Experience -->
+  <section data-animate data-delay="100" class="mb-16">
+    <h2 class="mb-6 text-2xl font-bold text-text-primary">
+      {strings.experience.professional}
+    </h2>
+    <ExperienceTimeline entries={experience} />
+  </section>
+
+  <!-- Skills -->
+  <section data-animate data-delay="200">
+    <h2 class="mb-6 text-2xl font-bold text-text-primary">
+      {strings.experience.skills}
+    </h2>
+    <div class="grid gap-6 sm:grid-cols-2">
+      {skills.map(group => (
+        <div class="rounded-xl border border-border p-5">
+          <h3 class="mb-3 text-sm font-semibold uppercase tracking-wider text-text-secondary">
+            {group.category}
+          </h3>
+          <div class="flex flex-wrap gap-2">
+            {group.items.map(item => (
+              <span class="rounded-full border border-border bg-bg-secondary/50 px-3 py-1 text-xs font-medium text-text-secondary transition-colors hover:border-accent hover:text-accent">
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+</PageLayout>

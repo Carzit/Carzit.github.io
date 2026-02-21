@@ -1,0 +1,47 @@
+---
+import PageLayout from '@layouts/PageLayout.astro';
+import PublicationCard from '@components/PublicationCard.astro';
+import { getCollection, render } from 'astro:content';
+import { t } from '@i18n/utils';
+
+const locale = 'en';
+const strings = t(locale);
+
+const allResearch = await getCollection('research');
+const publications = allResearch
+  .filter((entry) => entry.id.startsWith(`${locale}/`))
+  .sort((a, b) => b.data.year - a.data.year || a.data.order - b.data.order);
+
+const rendered = await Promise.all(
+  publications.map(async (entry) => {
+    const { Content } = await render(entry);
+    return { entry, Content };
+  })
+);
+---
+
+<PageLayout
+  title={strings.research.title}
+  description="Research publications by Zitong Cheng in quantitative finance and machine learning."
+>
+  <section data-animate>
+    <h2 class="mb-8 text-2xl font-bold text-text-primary">
+      {strings.research.publications}
+    </h2>
+    <div class="space-y-6">
+      {rendered.map(({ entry, Content }) => (
+        <PublicationCard
+          title={entry.data.title}
+          authors={entry.data.authors}
+          venue={entry.data.venue}
+          year={entry.data.year}
+          status={entry.data.status}
+          links={entry.data.links}
+          locale={locale}
+        >
+          <Content />
+        </PublicationCard>
+      ))}
+    </div>
+  </section>
+</PageLayout>

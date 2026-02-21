@@ -15,6 +15,11 @@ const blog = defineCollection({
   }),
 });
 
+const researchLinkType = z.enum([
+  'pdf', 'arxiv', 'code', 'doi',
+  'data', 'slides', 'poster', 'video', 'demo',
+]);
+
 const research = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/research' }),
   schema: z.object({
@@ -22,12 +27,15 @@ const research = defineCollection({
     authors: z.array(z.string()),
     venue: z.string(),
     year: z.number(),
-    status: z.enum(['published', 'under-review', 'preprint', 'working-paper']),
+    status: z.enum([
+      'published', 'accepted', 'revision',
+      'under-review', 'preprint', 'working-paper',
+    ]),
     tags: z.array(z.string()).default([]),
-    arxiv: z.string().optional(),
-    pdf: z.string().optional(),
-    code: z.string().optional(),
-    doi: z.string().optional(),
+    links: z.array(z.object({
+      type: researchLinkType,
+      url: z.string(),
+    })).default([]),
     featured: z.boolean().default(false),
     order: z.number().default(0),
   }),

@@ -1,0 +1,59 @@
+---
+interface TimelineEntry {
+  title: string;
+  organization: string;
+  location: string;
+  period: string;
+  highlights: string[];
+}
+
+interface Props {
+  entries: TimelineEntry[];
+}
+
+const { entries } = Astro.props;
+---
+
+<div>
+  {entries.map((entry, i) => (
+    <div class="flex gap-4 md:gap-6">
+      <!-- Desktop date -->
+      <div class="hidden w-28 shrink-0 text-right md:block">
+        <span class="inline-block pt-px font-mono text-sm font-medium text-accent">
+          {entry.period}
+        </span>
+      </div>
+
+      <!-- Timeline dot + line -->
+      <div class="flex flex-col items-center">
+        <div class="z-10 h-3 w-3 shrink-0 rounded-full border-2 border-accent bg-bg-primary" />
+        <div class={`w-px flex-1 ${i < entries.length - 1 ? 'bg-border' : ''}`} />
+      </div>
+
+      <!-- Content -->
+      <div class={`min-w-0 flex-1 ${i < entries.length - 1 ? 'pb-10 md:pb-12' : ''}`}>
+        <span class="mb-1 block font-mono text-sm font-medium text-accent md:hidden">
+          {entry.period}
+        </span>
+        <h3 class="text-base font-semibold text-text-primary">
+          {entry.title}
+        </h3>
+        <p class="mt-0.5 text-sm text-text-secondary">
+          {entry.organization}
+          <span class="mx-1">&middot;</span>
+          {entry.location}
+        </p>
+        {entry.highlights.length > 0 && (
+          <ul class="mt-3 space-y-2">
+            {entry.highlights.map(h => (
+              <li class="relative pl-4 text-sm leading-relaxed text-text-secondary">
+                <span class="absolute left-0 top-[0.4rem] h-1.5 w-1.5 rounded-full bg-accent/40" />
+                {h}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  ))}
+</div>

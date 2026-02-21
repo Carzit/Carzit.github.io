@@ -1,4 +1,7 @@
 ---
+import 'katex/dist/katex.min.css';
+import { ViewTransitions } from 'astro:transitions';
+
 interface Props {
   title: string;
   description: string;
@@ -31,12 +34,13 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={new URL(ogImage, Astro.site)} />
 
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.css"
-  integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ"
-  crossorigin="anonymous"
-/>
+<ViewTransitions />
+
+<noscript>
+  <style>
+    [data-animate] { opacity: 1 !important; transform: none !important; }
+  </style>
+</noscript>
 
 <script is:inline>
   const theme = (() => {

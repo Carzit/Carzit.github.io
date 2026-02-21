@@ -1,10 +1,31 @@
 ---
-import { getLocaleFromUrl, switchLocalePath } from '@i18n/utils';
+import { getLocaleFromUrl, switchLocalePath, getLocalePath } from '@i18n/utils';
+import { getCollection } from 'astro:content';
 
 const locale = getLocaleFromUrl(Astro.url);
 const targetLocale = locale === 'en' ? 'zh' : 'en';
-const targetPath = switchLocalePath(Astro.url.pathname, targetLocale);
 const label = locale === 'en' ? '中文' : 'EN';
+
+// Check if we're on a blog post page (e.g. /en/blog/some-slug)
+const pathname = Astro.url.pathname;
+const blogPostMatch = pathname.match(/^\/(en|zh)\/blog\/(.+?)\/?$/);
+
+let targetPath: string;
+
+if (blogPostMatch) {
+  const slug = blogPostMatch[2];
+  // Check if the translated blog post exists
+  const allPosts = await getCollection('blog');
+  const translationExists = allPosts.some(
+    (entry) => entry.id.startsWith(`${targetLocale}/`) &&
+      entry.id.replace(`${targetLocale}/`, '').replace(/\.(md|mdx)$/, '') === slug
+  );
+  targetPath = translationExists
+    ? getLocalePath(`/blog/${slug}`, targetLocale)
+    : getLocalePath('/blog', targetLocale);
+} else {
+  targetPath = switchLocalePath(pathname, targetLocale);
+}
 ---
 
 <a

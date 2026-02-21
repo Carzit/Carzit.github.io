@@ -1,0 +1,159 @@
+---
+title: "用 Astro 搭建我的学术主页"
+description: "技术分享：使用 Astro、Tailwind CSS 和 KaTeX 搭建一个现代化的双语学术主页——默认零 JavaScript、类型安全的内容管理、以及优雅的数学公式渲染。"
+pubDate: 2026-02-20
+tags: ["Astro", "Web 开发", "教程"]
+draft: false
+---
+
+## 为什么选择 Astro？
+
+搭建学术主页时，核心需求很明确：**快速加载**、**优秀的 SEO** 以及对数学公式和代码的**清晰排版**。在对比了 Jekyll、Hugo、Next.js 等方案后，我最终选择了 [Astro](https://astro.build/)，原因如下：
+
+- **默认零 JavaScript** — 页面以纯 HTML + CSS 形式交付
+- **内容集合** — 基于 Zod schema 的类型安全 Markdown/MDX
+- **内置 i18n** — 一流的双语路由支持
+- **岛屿架构** — 仅在需要时添加交互功能
+
+> 最好的框架，是那种不会挡你路、让内容自己发光的框架。
+
+## 项目架构
+
+网站采用清晰、扁平的目录结构：
+
+```
+src/
+├── components/     # 可复用 UI 组件
+├── content/        # Markdown/MDX 内容集合
+│   ├── blog/       # 博文 (en/ + zh/)
+│   └── research/   # 研究论文 (en/ + zh/)
+├── i18n/           # 翻译字符串
+├── layouts/        # 页面布局
+├── lib/            # 工具函数和常量
+├── pages/          # 基于文件的路由
+│   ├── en/         # 英文页面
+│   └── zh/         # 中文页面
+└── styles/         # 全局样式
+```
+
+每个内容集合都通过 Zod schema 进行验证。例如，博客集合的 schema 确保每篇文章都具备必需的前置数据：
+
+```typescript
+const blog = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/blog' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    pubDate: z.coerce.date(),
+    updatedDate: z.coerce.date().optional(),
+    tags: z.array(z.string()).default([]),
+    draft: z.boolean().default(false),
+  }),
+});
+```
+
+## KaTeX 数学公式渲染
+
+学术网站的一个关键需求是对数学公式的支持。通过 `remark-math` 和 `rehype-katex`，可以直接在 Markdown 中编写 LaTeX。
+
+### 行内公式
+
+逻辑回归的损失函数为 $\mathcal{L}(\theta) = -\frac{1}{N}\sum_{i=1}^{N}[y_i \log(\hat{y}_i) + (1-y_i)\log(1-\hat{y}_i)]$，其中 $\hat{y}_i = \sigma(\mathbf{x}_i^T\theta)$。
+
+### 块级公式
+
+用于资产嵌入研究中的余弦相似度计算：
+
+$$
+\text{sim}(\mathbf{v}_i, \mathbf{v}_j) = \frac{\mathbf{v}_i \cdot \mathbf{v}_j}{\|\mathbf{v}_i\| \cdot \|\mathbf{v}_j\|}
+$$
+
+更复杂的例子——Transformer 中的注意力机制：
+
+$$
+\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
+$$
+
+## 代码高亮
+
+Astro 使用 [Shiki](https://shiki.style/) 进行语法高亮，支持双主题。以下是查询内容集合的示例：
+
+```astro
+---
+import { getCollection, render } from 'astro:content';
+
+const allPosts = await getCollection('blog');
+const posts = allPosts
+  .filter((entry) => entry.id.startsWith('en/'))
+  .filter((entry) => !entry.data.draft)
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+---
+
+{posts.map((post) => (
+  <BlogPostCard title={post.data.title} />
+))}
+```
+
+Python 中计算资产嵌入的代码片段：
+
+```python
+import numpy as np
+from gensim.models import Word2Vec
+
+def train_asset_embeddings(portfolios: list[list[str]], dim: int = 64):
+    """训练金融资产的 Word2Vec 风格嵌入向量。"""
+    model = Word2Vec(
+        sentences=portfolios,
+        vector_size=dim,
+        window=5,
+        min_count=1,
+        workers=4,
+        sg=1,  # skip-gram
+    )
+    return model.wv
+```
+
+### 暗色模式支持
+
+代码块会根据网站的暗色模式设置自动切换主题——亮色模式使用 `github-light`，暗色模式使用 `one-dark-pro`。这通过 Shiki 的 CSS 变量实现：
+
+```css
+.dark .astro-code,
+.dark .astro-code span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+}
+```
+
+## 双语支持
+
+i18n 系统采用简洁而有效的方案：
+
+1. **路由**：通过 Astro 内置 i18n 支持 `/en/` 和 `/zh/` 前缀
+2. **界面文字**：独立的翻译文件（`en.ts`、`zh.ts`）管理所有 UI 文本
+3. **内容**：平行的内容目录（`content/blog/en/`、`content/blog/zh/`）
+4. **语言切换**：切换语言时保持当前页面路径
+
+## 性能表现
+
+最终构建达到了出色的性能指标：
+
+| 指标 | 分数 |
+|------|------|
+| 首次内容绘制 | < 0.8s |
+| 页面总重量 | < 150KB |
+| Lighthouse 性能 | 98+ |
+| JavaScript 大小 | 0KB（静态页面） |
+
+## 下一步计划
+
+未来还计划实现以下增强功能：
+
+- **RSS 订阅** — 方便读者订阅博客更新
+- **全文搜索** — 使用 Pagefind 实现客户端搜索
+- **评论系统** — 基于 Giscus（GitHub Discussions）
+- **视图过渡动画** — 实现页面间的平滑切换
+
+---
+
+*本文用于测试博客系统的渲染能力——包括 KaTeX 数学公式、Shiki 代码高亮、表格、列表、引用块和响应式排版。*

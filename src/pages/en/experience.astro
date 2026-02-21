@@ -1,0 +1,165 @@
+---
+import PageLayout from '@layouts/PageLayout.astro';
+import ExperienceTimeline from '@components/ExperienceTimeline.astro';
+import { t } from '@i18n/utils';
+
+const locale = 'en';
+const strings = t(locale);
+
+const courses = [
+  'Real Analysis',
+  'Stochastic Process (99)',
+  'Machine Learning in Econ & Finance (97)',
+  'Financial Engineering (95)',
+  'Econometrics (90)',
+  'Probability & Statistics',
+  'Linear Algebra',
+  'Differential Equations',
+  'Data Analysis with Python',
+];
+
+const honors = [
+  'Top 10 Nationwide — Tsinghua University "Jinjing Ledao" Economic Analysis Competition',
+  'Team Leader — UBS Financial Elite Challenge',
+];
+
+const experience = [
+  {
+    title: 'Quantitative Research Intern',
+    organization: 'Huatai Securities',
+    location: 'Remote, China',
+    period: 'Aug–Oct 2025',
+    highlights: [
+      'Implemented asset representation learning framework based on "Asset Embeddings in China" research; completed end-to-end pipeline including data preprocessing, quarterly embedding model training, backtesting, and deployment.',
+      'Conducted cross-sectional analysis on embedded representations to uncover sector rotation trends, fund style drift, and risk-return asymmetries; delivered findings to senior managers.',
+    ],
+  },
+  {
+    title: 'Quantitative Research Intern',
+    organization: 'Shenwan Hongyuan Group',
+    location: 'Shanghai, China',
+    period: 'Jul–Sep 2024',
+    highlights: [
+      'Reproduced and extended Duan et al.\'s FactorVAE model for cross-sectional return prediction; this work directly inspired the development of AttnFactorVAE.',
+      'Supported weekly investment strategy research by consolidating insights from institutional reports, identifying macro themes and sector rotations for portfolio managers.',
+    ],
+  },
+];
+
+const skills = [
+  {
+    category: 'Programming',
+    items: ['Python', 'PyTorch', 'TensorFlow', 'Pandas', 'NumPy', 'Scikit-Learn', 'SQL', 'Git', 'C', 'Lua'],
+  },
+  {
+    category: 'Machine Learning',
+    items: ['VAE', 'Attention / Transformers', 'GRU / LSTM', 'Diffusion Models', 'Supervised Learning', 'Dimensionality Reduction', 'Representation Learning'],
+  },
+  {
+    category: 'Finance',
+    items: ['Factor Models', 'Portfolio Optimization', 'Backtesting', 'Econometrics', 'Financial Econometrics'],
+  },
+  {
+    category: 'Languages',
+    items: ['Mandarin (Native)', 'English (TOEFL 106)'],
+  },
+];
+---
+
+<PageLayout
+  title={strings.experience.title}
+  description="Education, professional experience, and skills of Zitong Cheng."
+>
+  <!-- Education -->
+  <section data-animate class="mb-16">
+    <h2 class="mb-6 text-2xl font-bold text-text-primary">
+      {strings.experience.education}
+    </h2>
+    <article class="rounded-xl border border-border p-6">
+      <!-- Header -->
+      <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-start">
+        <div>
+          <h3 class="text-lg font-semibold text-text-primary">
+            Sun Yat-sen University, Lingnan College
+          </h3>
+          <p class="mt-1 text-sm text-text-secondary">
+            B.Econ in Finance, Minor in Statistics
+          </p>
+        </div>
+        <div class="shrink-0 text-sm text-text-secondary sm:text-right">
+          <p>Guangzhou, China</p>
+          <p>2022 – 2026 (Expected)</p>
+        </div>
+      </div>
+
+      <!-- GPA -->
+      <div class="mt-5 flex items-baseline gap-2">
+        <span class="text-3xl font-bold text-accent">3.8</span>
+        <span class="text-lg text-text-secondary">/4.0</span>
+        <span class="ml-1 text-sm font-medium text-text-secondary">GPA</span>
+      </div>
+
+      <!-- Core Courses -->
+      <div class="mt-6">
+        <h4 class="mb-3 text-sm font-semibold uppercase tracking-wider text-text-secondary">
+          {strings.experience.coreCourses}
+        </h4>
+        <div class="flex flex-wrap gap-2">
+          {courses.map(course => (
+            <span class="rounded-full border border-border bg-bg-secondary/50 px-3 py-1 text-xs font-medium text-text-secondary transition-colors hover:border-accent hover:text-accent">
+              {course}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <!-- Honors -->
+      <div class="mt-6">
+        <h4 class="mb-3 text-sm font-semibold uppercase tracking-wider text-text-secondary">
+          {strings.experience.honors}
+        </h4>
+        <ul class="space-y-2">
+          {honors.map(honor => (
+            <li class="flex items-start gap-2 text-sm text-text-secondary">
+              <svg class="mt-0.5 h-4 w-4 shrink-0 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+              {honor}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </article>
+  </section>
+
+  <!-- Professional Experience -->
+  <section data-animate data-delay="100" class="mb-16">
+    <h2 class="mb-6 text-2xl font-bold text-text-primary">
+      {strings.experience.professional}
+    </h2>
+    <ExperienceTimeline entries={experience} />
+  </section>
+
+  <!-- Skills -->
+  <section data-animate data-delay="200">
+    <h2 class="mb-6 text-2xl font-bold text-text-primary">
+      {strings.experience.skills}
+    </h2>
+    <div class="grid gap-6 sm:grid-cols-2">
+      {skills.map(group => (
+        <div class="rounded-xl border border-border p-5">
+          <h3 class="mb-3 text-sm font-semibold uppercase tracking-wider text-text-secondary">
+            {group.category}
+          </h3>
+          <div class="flex flex-wrap gap-2">
+            {group.items.map(item => (
+              <span class="rounded-full border border-border bg-bg-secondary/50 px-3 py-1 text-xs font-medium text-text-secondary transition-colors hover:border-accent hover:text-accent">
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+</PageLayout>

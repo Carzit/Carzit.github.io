@@ -11,7 +11,8 @@ const currentPath = Astro.url.pathname;
 
 <header
   id="site-header"
-  class="sticky top-0 z-50 w-full border-b border-border bg-bg-primary/80 backdrop-blur-lg transition-all duration-300"
+  class="sticky top-0 z-50 w-full border-b"
+  transition:animate="none"
 >
   <nav class="mx-auto flex h-16 max-w-4xl items-center justify-between px-4 md:px-6">
     <a
@@ -30,10 +31,10 @@ const currentPath = Astro.url.pathname;
           <a
             href={href}
             class:list={[
-              'rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+              'link-underline rounded-lg px-3 py-2 text-sm font-medium transition-colors',
               isActive
                 ? 'text-accent'
-                : 'text-text-secondary hover:bg-bg-secondary hover:text-text-primary',
+                : 'text-text-secondary hover:text-text-primary',
             ]}
           >
             {strings.nav[item.key]}
@@ -67,26 +68,28 @@ const currentPath = Astro.url.pathname;
     </div>
   </nav>
 
-  <!-- Mobile menu -->
-  <div id="mobile-menu" class="hidden border-t border-border md:hidden">
-    <div class="mx-auto max-w-4xl space-y-1 px-4 py-3">
-      {NAV_ITEMS.map((item) => {
-        const href = getLocalePath(item.path, locale);
-        const isActive = currentPath === href || (item.path !== '/' && currentPath.startsWith(href));
-        return (
-          <a
-            href={href}
-            class:list={[
-              'block rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-              isActive
-                ? 'text-accent bg-bg-secondary'
-                : 'text-text-secondary hover:bg-bg-secondary hover:text-text-primary',
-            ]}
-          >
-            {strings.nav[item.key]}
-          </a>
-        );
-      })}
+  <!-- Mobile menu (slide animation) -->
+  <div id="mobile-menu" class="mobile-menu-inner border-t border-border md:hidden">
+    <div class="overflow-hidden">
+      <div class="mx-auto max-w-4xl space-y-1 px-4 py-3">
+        {NAV_ITEMS.map((item) => {
+          const href = getLocalePath(item.path, locale);
+          const isActive = currentPath === href || (item.path !== '/' && currentPath.startsWith(href));
+          return (
+            <a
+              href={href}
+              class:list={[
+                'block rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                isActive
+                  ? 'text-accent bg-bg-secondary'
+                  : 'text-text-secondary hover:bg-bg-secondary hover:text-text-primary',
+              ]}
+            >
+              {strings.nav[item.key]}
+            </a>
+          );
+        })}
+      </div>
     </div>
   </div>
 </header>
@@ -100,9 +103,15 @@ const currentPath = Astro.url.pathname;
     const hamburger = btn.querySelector('.hamburger-icon') as HTMLElement;
     const close = btn.querySelector('.close-icon') as HTMLElement;
 
+    // Reset state
+    menu.classList.remove('is-open');
+    hamburger.classList.remove('hidden');
+    close.classList.add('hidden');
+    btn.setAttribute('aria-expanded', 'false');
+
     btn.addEventListener('click', () => {
-      const isOpen = !menu.classList.contains('hidden');
-      menu.classList.toggle('hidden');
+      const isOpen = menu.classList.contains('is-open');
+      menu.classList.toggle('is-open');
       hamburger.classList.toggle('hidden');
       close.classList.toggle('hidden');
       btn.setAttribute('aria-expanded', String(!isOpen));

@@ -6,7 +6,7 @@ const locale = getLocaleFromUrl(Astro.url);
 const strings = t(locale);
 ---
 
-<footer class="border-t border-border">
+<footer class="border-t border-border" transition:animate="none">
   <div class="mx-auto flex max-w-4xl flex-col items-center gap-4 px-4 py-8 md:flex-row md:justify-between md:px-6">
     <p class="text-sm text-text-secondary">
       {strings.common.copyright}

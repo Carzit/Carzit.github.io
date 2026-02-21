@@ -1,0 +1,45 @@
+---
+import PageLayout from '@layouts/PageLayout.astro';
+import BlogPostCard from '@components/BlogPostCard.astro';
+import { getCollection } from 'astro:content';
+import { t } from '@i18n/utils';
+import { getReadingTime } from '@lib/utils';
+
+const locale = 'en';
+const strings = t(locale);
+
+const allPosts = await getCollection('blog');
+const posts = allPosts
+  .filter((entry) => entry.id.startsWith(`${locale}/`))
+  .filter((entry) => !entry.data.draft)
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+---
+
+<PageLayout
+  title={strings.blog.title}
+  description="Blog posts by Zitong Cheng on quantitative finance, machine learning, and web development."
+>
+  <section data-animate>
+    {posts.length > 0 ? (
+      <div class="space-y-6">
+        {posts.map((post) => {
+          const slug = post.id.replace(`${locale}/`, '').replace(/\.(md|mdx)$/, '');
+          const readingTime = getReadingTime(post.body ?? '');
+          return (
+            <BlogPostCard
+              title={post.data.title}
+              description={post.data.description}
+              pubDate={post.data.pubDate}
+              tags={post.data.tags}
+              slug={slug}
+              readingTime={readingTime}
+              locale={locale}
+            />
+          );
+        })}
+      </div>
+    ) : (
+      <p class="text-center text-text-secondary">{strings.blog.noPostsYet}</p>
+    )}
+  </section>
+</PageLayout>

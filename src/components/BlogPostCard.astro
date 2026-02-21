@@ -1,0 +1,46 @@
+---
+import type { Locale } from '@i18n/utils';
+import { t, getLocalePath } from '@i18n/utils';
+import { formatDate } from '@lib/utils';
+
+interface Props {
+  title: string;
+  description: string;
+  pubDate: Date;
+  tags: string[];
+  slug: string;
+  readingTime: number;
+  locale: Locale;
+}
+
+const { title, description, pubDate, tags, slug, readingTime, locale } = Astro.props;
+const strings = t(locale);
+const href = getLocalePath(`/blog/${slug}`, locale);
+---
+
+<article class="group rounded-xl border border-border p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-accent/30 hover:shadow-lg hover:shadow-accent/5">
+  <a href={href} class="block">
+    <h3 class="mb-2 text-lg font-semibold text-text-primary transition-colors duration-200 group-hover:text-accent">
+      {title}
+    </h3>
+    <div class="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-text-secondary">
+      <time datetime={pubDate.toISOString()}>
+        {formatDate(pubDate, locale)}
+      </time>
+      <span>&middot;</span>
+      <span>{readingTime} {strings.blog.minRead}</span>
+    </div>
+    <p class="mb-4 line-clamp-2 text-sm leading-relaxed text-text-secondary">
+      {description}
+    </p>
+  </a>
+  {tags.length > 0 && (
+    <div class="flex flex-wrap gap-2">
+      {tags.map((tag) => (
+        <span class="rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent">
+          {tag}
+        </span>
+      ))}
+    </div>
+  )}
+</article>
