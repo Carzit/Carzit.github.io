@@ -38,6 +38,7 @@ const research = defineCollection({
     })).default([]),
     featured: z.boolean().default(false),
     order: z.number().default(0),
+    draft: z.boolean().default(false),
   }),
 });
 

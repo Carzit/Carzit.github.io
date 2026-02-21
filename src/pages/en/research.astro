@@ -9,7 +9,7 @@ const strings = t(locale);
 
 const allResearch = await getCollection('research');
 const publications = allResearch
-  .filter((entry) => entry.id.startsWith(`${locale}/`))
+  .filter((entry) => entry.id.startsWith(`${locale}/`) && !entry.data.draft)
   .sort((a, b) => b.data.year - a.data.year || a.data.order - b.data.order);
 
 const rendered = await Promise.all(
