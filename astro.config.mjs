@@ -6,7 +6,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 
 export default defineConfig({
-  site: 'https://username.github.io',
+  site: 'https://Carzit.github.io',
   output: 'static',
   i18n: {
     defaultLocale: 'en',
