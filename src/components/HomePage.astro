@@ -1,7 +1,7 @@
 ---
 import EmbeddingMap from '@components/EmbeddingMap.astro';
 import PaperList from '@components/PaperList.astro';
-import { getLocalePath, t, type Locale } from '@i18n/utils';
+import { t, type Locale } from '@i18n/utils';
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { SITE, SOCIAL } from '@lib/constants';
 import { getPapers } from '@lib/research';
@@ -17,7 +17,7 @@ const papers = await getPapers(locale);
 ---
 
 <BaseLayout
-  title={`${strings.home.name} · ${strings.home.title}`}
+  title={strings.home.title}
   description={isZh ? SITE.descriptionZh : SITE.description}
   overlayHeader
 >
@@ -53,10 +53,9 @@ const papers = await getPapers(locale);
   </EmbeddingMap>
 
   <section class="shell pb-20 pt-14 md:pt-20">
-    <div class="label mb-4 flex items-baseline justify-between text-text-secondary">
-      <h2 class="font-medium uppercase tracking-[0.12em]">{strings.research.title}</h2>
-      <a href={getLocalePath('/research', locale)} class="link">{strings.home.allResearch}</a>
-    </div>
+    <h2 class="label mb-4 font-medium uppercase tracking-[0.12em] text-text-secondary">
+      {strings.research.title}
+    </h2>
     <PaperList papers={papers} locale={locale} />
   </section>
 </BaseLayout>

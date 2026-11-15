@@ -40,7 +40,7 @@ const items = await Promise.all(
           </details>
         )}
       </div>
-      <div class="label text-text-secondary md:pt-1">
+      <div class="font-sans text-[0.9375rem] leading-normal text-text-secondary md:pt-1">
         <p class="font-medium text-text-primary">{data.statusLabel ?? strings.status[data.status]}</p>
         {coauthors && <p>{strings.with} {coauthors}</p>}
         {data.links.map((link) => (

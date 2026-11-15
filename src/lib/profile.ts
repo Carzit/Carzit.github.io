@@ -22,18 +22,11 @@ export const CV: Record<Locale, CvSection[]> = {
           label: '2026 – 2027',
           title: 'Master of Financial Engineering',
           organization: 'Risk Management Institute, National University of Singapore',
-          details: [
-            'Coursework: Financial Econometrics, Portfolio Theory and Investments, Stochastic Calculus and Quantitative Methods, Fixed Income.',
-          ],
         },
         {
           label: '2022 – 2026',
           title: 'Bachelor of Economics in Finance, Minor in Statistics',
           organization: 'Lingnan College, Sun Yat-sen University',
-          details: [
-            'Thesis: VAE Probabilistic Factor Models and Asset Pricing (advisor: Jianhao Lin).',
-            'Coursework: Stochastic Processes, Probability and Statistics, Linear Algebra, Differential Equations, Real Analysis, Machine Learning in Economics and Finance, Financial Engineering, Econometrics.',
-          ],
         },
       ],
     },
@@ -94,16 +87,11 @@ export const CV: Record<Locale, CvSection[]> = {
           label: '2026 – 2027',
           title: '金融工程硕士',
           organization: '新加坡国立大学风险管理研究所',
-          details: ['课程：金融计量经济学、投资组合理论与投资、随机分析与数量方法、固定收益。'],
         },
         {
           label: '2022 – 2026',
           title: '经济学学士（金融学），辅修统计学',
           organization: '中山大学岭南学院',
-          details: [
-            '毕业论文：VAE Probabilistic Factor Models and Asset Pricing（指导教师：林建浩）。',
-            '课程：随机过程、概率论与数理统计、线性代数、微分方程、实分析、经济与金融中的机器学习、金融工程、计量经济学。',
-          ],
         },
       ],
     },

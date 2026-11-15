@@ -6,12 +6,11 @@ export default {
     cv: 'CV',
   },
   home: {
-    title: 'Empirical asset pricing and machine learning',
+    title: 'Zitong Cheng Homepage',
     name: 'Zitong Cheng',
     otherName: '程子桐',
     where: 'MFE student · Risk Management Institute, NUS',
-    lede: 'I work on empirical asset pricing, machine learning in finance, and the econometrics of representation learning.',
-    allResearch: 'Abstracts',
+    lede: 'I work on empirical asset pricing, AI in finance, and the econometrics of representation learning.',
   },
   map: {
     hint: 'Point at a stock.',
@@ -28,7 +27,7 @@ export default {
   },
   research: {
     title: 'Research',
-    intro: 'Empirical asset pricing, machine learning in finance, and the econometrics of representation learning.',
+    intro: 'Empirical asset pricing, AI in finance, and the econometrics of representation learning.',
     workingPapers: 'Working papers',
     inProgress: 'Work in progress',
     with: 'with',

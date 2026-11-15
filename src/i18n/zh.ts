@@ -8,12 +8,11 @@ const zh: typeof en = {
     cv: '简历',
   },
   home: {
-    title: '实证资产定价与机器学习',
+    title: '程子桐的个人主页',
     name: '程子桐',
     otherName: 'Zitong Cheng',
     where: '新加坡国立大学风险管理研究所 · 金融工程硕士在读',
-    lede: '我的研究方向是实证资产定价、金融机器学习和表示学习的计量经济学。',
-    allResearch: '查看摘要',
+    lede: '我的研究方向是实证资产定价、金融人工智能和表示学习的计量经济学。',
   },
   map: {
     hint: '指向一只股票。',
@@ -28,7 +27,7 @@ const zh: typeof en = {
   },
   research: {
     title: '研究',
-    intro: '实证资产定价、金融机器学习、表示学习的计量经济学。',
+    intro: '实证资产定价、金融人工智能、表示学习的计量经济学。',
     workingPapers: '工作论文',
     inProgress: '进行中的研究',
     with: '合作者：',

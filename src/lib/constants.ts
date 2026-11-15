@@ -1,8 +1,8 @@
 export const SITE = {
   title: 'Zitong Cheng',
   titleZh: '程子桐',
-  description: 'Zitong Cheng works on empirical asset pricing, machine learning in finance, and the econometrics of representation learning.',
-  descriptionZh: '程子桐的个人主页。研究方向：实证资产定价、金融机器学习、表示学习的计量经济学。',
+  description: 'Zitong Cheng works on empirical asset pricing, AI in finance, and the econometrics of representation learning.',
+  descriptionZh: '程子桐的个人主页。研究方向：实证资产定价、金融人工智能、表示学习的计量经济学。',
   url: 'https://carzit.github.io',
   author: 'Zitong Cheng',
 };
