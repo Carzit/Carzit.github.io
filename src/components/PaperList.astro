@@ -1,0 +1,52 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+
+import { t, type Locale } from '@i18n/utils';
+import { formatCoauthors } from '@lib/research';
+
+interface Props {
+  papers: CollectionEntry<'research'>[];
+  locale: Locale;
+  abstracts?: boolean;
+}
+
+const { papers, locale, abstracts = false } = Astro.props;
+const strings = t(locale).research;
+
+const items = await Promise.all(
+  papers.map(async (entry) => ({
+    data: entry.data,
+    coauthors: formatCoauthors(entry.data.authors, locale),
+    // Papers without a body (work in progress) show no abstract.
+    Content: abstracts && entry.body?.trim() ? (await render(entry)).Content : null,
+  })),
+);
+---
+
+<div>
+  {items.map(({ data, coauthors, Content }) => (
+    <article class="grid gap-x-12 gap-y-3 border-t border-border py-6 md:grid-cols-[1fr_16rem] md:py-7">
+      <div>
+        <h3 class="text-balance text-xl font-medium leading-tight tracking-tight md:text-[1.6rem]">
+          {data.title}
+        </h3>
+        {data.finding && <p class="mt-2 max-w-[40rem] text-text-secondary">{data.finding}</p>}
+        {Content && (
+          <details class="mt-3 max-w-[40rem]">
+            <summary class="label cursor-pointer text-text-secondary hover:text-accent">
+              {strings.abstract}
+            </summary>
+            <div class="mt-2 text-[0.975rem] text-text-secondary"><Content /></div>
+          </details>
+        )}
+      </div>
+      <div class="label text-text-secondary md:pt-1">
+        <p class="font-medium text-text-primary">{data.statusLabel ?? strings.status[data.status]}</p>
+        {coauthors && <p>{strings.with} {coauthors}</p>}
+        {data.links.map((link) => (
+          <p><a href={link.url} class="link text-text-primary">{link.label}</a></p>
+        ))}
+      </div>
+    </article>
+  ))}
+</div>

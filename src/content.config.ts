@@ -15,28 +15,23 @@ const blog = defineCollection({
   }),
 });
 
-const researchLinkType = z.enum([
-  'pdf', 'arxiv', 'code', 'doi',
-  'data', 'slides', 'poster', 'video', 'demo',
-]);
-
 const research = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/research' }),
   schema: z.object({
     title: z.string(),
     authors: z.array(z.string()),
-    venue: z.string(),
-    year: z.number(),
     status: z.enum([
-      'published', 'accepted', 'revision',
-      'under-review', 'preprint', 'working-paper',
+      'published', 'accepted', 'revision', 'under-review',
+      'preprint', 'working-paper', 'in-progress',
     ]),
-    tags: z.array(z.string()).default([]),
+    // Shown instead of the generic status label, e.g. "R&R, Management Science".
+    statusLabel: z.string().optional(),
+    // One sentence: the headline result. Left out for work in progress.
+    finding: z.string().optional(),
     links: z.array(z.object({
-      type: researchLinkType,
-      url: z.string(),
+      label: z.string(),
+      url: z.string().url(),
     })).default([]),
-    featured: z.boolean().default(false),
     order: z.number().default(0),
     draft: z.boolean().default(false),
   }),

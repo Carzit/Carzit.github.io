@@ -1,0 +1,335 @@
+---
+import { t, type Locale } from '@i18n/utils';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const s = t(locale).map;
+// The stock count is filled in from the data once it loads.
+const [captionBefore, captionAfter] = s.caption.split('{n}');
+---
+
+<section
+  class="relative flex flex-col overflow-hidden border-b border-border lg:block lg:h-svh lg:min-h-[640px]"
+  data-embedding-map
+  data-src="/data/embedding-2023Q4.json"
+  data-strings={JSON.stringify(s)}
+>
+  <canvas
+    class="h-[60svh] max-h-[640px] w-full touch-pan-y lg:absolute lg:inset-0 lg:h-full lg:max-h-none"
+    aria-hidden="true"
+  ></canvas>
+
+  <slot />
+
+  <div class="legend px-[var(--gutter)] pb-8 font-sans text-text-secondary lg:absolute lg:bottom-6 lg:right-[var(--edge)] lg:w-[21rem] lg:p-0 lg:text-right">
+    <p class="min-h-[1.5em] font-medium text-text-primary" data-readout>{s.hint}</p>
+    <div class="my-2 flex flex-wrap gap-1 lg:justify-end">
+      <span class="flex gap-px" role="group" aria-label={s.view}>
+        <button type="button" data-view="3" aria-pressed="true">3D</button>
+        <button type="button" data-view="2" aria-pressed="false">2D</button>
+      </span>
+      <span class="flex flex-wrap gap-1 lg:justify-end" role="group" aria-label={s.highlight}>
+        {s.groups.map((name, i) => (
+          <button type="button" data-group={i} aria-pressed={i === 0 ? 'true' : 'false'}>{name}</button>
+        ))}
+      </span>
+    </div>
+    <p>{captionBefore}<span data-count>4,958</span>{captionAfter} <span data-rotate>{s.rotate}</span></p>
+  </div>
+</section>
+
+<style>
+  .legend {
+    font-size: 0.7rem;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    pointer-events: none;
+  }
+  button {
+    pointer-events: auto;
+    cursor: pointer;
+    padding: 0.1rem 0.4rem;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--bg-primary) 80%, transparent);
+  }
+  button:hover {
+    color: var(--text-primary);
+    border-color: var(--text-primary);
+  }
+  button[data-group][aria-pressed='true'] {
+    color: #fff;
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  button[data-view][aria-pressed='true'] {
+    color: var(--bg-primary);
+    background: var(--text-primary);
+    border-color: var(--text-primary);
+  }
+  canvas {
+    cursor: grab;
+  }
+  canvas.is-dragging {
+    cursor: grabbing;
+  }
+  canvas.is-flat {
+    cursor: crosshair;
+  }
+</style>
+
+<script>
+  interface MapData {
+    codes: string[];
+    x: number[]; y: number[]; z: number[];
+    u: number[]; v: number[];
+    soe: string;
+    nn: number[];
+  }
+
+  interface Strings {
+    hint: string;
+    owner: string[];
+    groups: string[];
+    groupPhrase: string[];
+    readout: string;
+  }
+
+  interface Point {
+    i: number; code: string; board: number; soe: number; hot: boolean;
+    x: number; y: number; z: number; u: number; v: number;
+    sx: number; sy: number; d: number;
+  }
+
+  const BINS = 5;
+  const CAMERA = 3.4;
+  const PICK_RADIUS = 18;
+  const TAU = Math.PI * 2;
+
+  // Listing board from the stock code: Shanghai Main, Shenzhen Main, ChiNext, STAR, Beijing.
+  const boardOf = (code: string) =>
+    code.startsWith('68') ? 3 : code.startsWith('30') ? 2 : code[0] === '6' ? 0 : code[0] === '0' ? 1 : 4;
+
+  function init(root: HTMLElement, D: MapData) {
+    const cv = root.querySelector('canvas')!;
+    const ctx = cv.getContext('2d')!;
+    const readout = root.querySelector<HTMLElement>('[data-readout]')!;
+    const rotateHint = root.querySelector<HTMLElement>('[data-rotate]')!;
+    const intro = root.querySelector<HTMLElement>('[data-intro]');
+    const wide = matchMedia('(min-width: 64rem)');
+    const S: Strings = JSON.parse(root.dataset.strings!);
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const K = D.nn.length / D.codes.length;
+    const pts: Point[] = D.codes.map((code, i) => ({
+      i, code, board: boardOf(code), soe: +D.soe[i], hot: false,
+      x: D.x[i] / 1000, y: D.y[i] / 1000, z: D.z[i] / 1000, u: D.u[i] / 1000, v: D.v[i] / 1000,
+      sx: 0, sy: 0, d: 0,
+    }));
+    root.querySelector('[data-count]')!.textContent = pts.length.toLocaleString('en-US');
+
+    // Group 0 is state ownership; groups 1–5 are the listing boards.
+    const inGroup = (p: Point, g: number) => (g === 0 ? p.soe === 1 : p.board === g - 1);
+    let group = 0;
+    const mark = () => { for (const p of pts) p.hot = inGroup(p, group); };
+    mark();
+
+    let ink = '', hot = '';
+    const readColors = () => {
+      const css = getComputedStyle(document.documentElement);
+      ink = css.getPropertyValue('--text-primary').trim();
+      hot = css.getPropertyValue('--accent').trim();
+    };
+    readColors();
+
+    let W = 0, H = 0, cx = 0, cy = 0, R = 0;
+    let yaw = 0.6, pitch = -0.28;
+    let grow = still ? 1 : 0, born = 0;
+    let flat = 0, flatTarget = 0;
+    let hover: Point | null = null, nbrs: Point[] = [];
+    let drag: { x: number; y: number; yaw: number; pitch: number } | null = null;
+    let raf = 0, last = 0, seen = true;
+
+    function size() {
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      W = cv.clientWidth; H = cv.clientHeight;
+      cv.width = W * dpr; cv.height = H * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (wide.matches) {
+        // The intro text sits over the left of the canvas: keep the cloud clear of it.
+        const textRight = intro ? intro.getBoundingClientRect().right - cv.getBoundingClientRect().left : 0;
+        R = Math.min(W * 0.33, H * 0.45, (W - textRight) * 0.52);
+        cx = Math.max(W * 0.58, textRight + R * 0.92);
+        cy = H * 0.49;
+      } else {
+        R = Math.min(W * 0.56, H * 0.5);
+        cx = W / 2;
+        cy = H * 0.52;
+      }
+      wake();
+    }
+
+    // Blend between the rotating 3-D cloud (f = 0) and the flat 2-D layout (f = 1).
+    function project(f: number) {
+      const e = (1 - Math.pow(1 - grow, 3)) * R;
+      const a = yaw * (1 - f), b = pitch * (1 - f);
+      const ca = Math.cos(a), sa = Math.sin(a), cb = Math.cos(b), sb = Math.sin(b);
+      for (const p of pts) {
+        const X = p.x + (p.u - p.x) * f, Y = p.y + (p.v - p.y) * f, Z = p.z * (1 - f);
+        const x = X * ca + Z * sa, z0 = Z * ca - X * sa;
+        const y = Y * cb - z0 * sb, z = Y * sb + z0 * cb;
+        const k = CAMERA / (CAMERA + z) * e;
+        p.sx = cx + x * k; p.sy = cy + y * k; p.d = z;
+      }
+    }
+
+    function draw() {
+      const f = flat * flat * (3 - 2 * flat);
+      project(f);
+      ctx.clearRect(0, 0, W, H);
+      // Far points first, smaller and fainter, so depth reads without sorting every point.
+      for (let b = BINS - 1; b >= 0; b--) {
+        const depth = 1 - b / (BINS - 1);
+        const near = depth + (0.75 - depth) * f;
+        const r = 0.9 + near * 1.3;
+        for (const on of [false, true]) {
+          ctx.fillStyle = on ? hot : ink;
+          ctx.globalAlpha = (on ? 0.35 + near * 0.6 : 0.1 + near * 0.32) * (hover && !on ? 0.6 : 1);
+          ctx.beginPath();
+          for (const p of pts) {
+            if (p.hot !== on) continue;
+            const bin = Math.min(BINS - 1, Math.max(0, ((p.d + 1) / 2 * BINS) | 0));
+            if (bin !== b) continue;
+            ctx.moveTo(p.sx + r, p.sy);
+            ctx.arc(p.sx, p.sy, r, 0, TAU);
+          }
+          ctx.fill();
+        }
+      }
+      ctx.globalAlpha = 1;
+      if (!hover) return;
+      ctx.strokeStyle = ink; ctx.lineWidth = 0.9;
+      ctx.beginPath();
+      for (const n of nbrs) { ctx.moveTo(hover.sx, hover.sy); ctx.lineTo(n.sx, n.sy); }
+      ctx.stroke();
+      for (const p of [...nbrs, hover]) {
+        ctx.fillStyle = p.hot ? hot : ink;
+        ctx.beginPath(); ctx.arc(p.sx, p.sy, p === hover ? 5 : 3.2, 0, TAU); ctx.fill();
+      }
+      ctx.beginPath(); ctx.arc(hover.sx, hover.sy, 10, 0, TAU); ctx.stroke();
+    }
+
+    function frame(now: number) {
+      raf = 0;
+      const dt = Math.min(50, now - (last || now));
+      last = now;
+      born ||= now;
+      if (grow < 1) grow = Math.min(1, (now - born) / 1800);
+      if (flat !== flatTarget) {
+        const step = still ? 1 : dt / 900;
+        flat = flatTarget > flat ? Math.min(1, flat + step) : Math.max(0, flat - step);
+      }
+      const spinning = !still && !drag && !hover && seen && flat === 0 && flatTarget === 0;
+      if (spinning) yaw += dt * 0.00012;
+      if (yaw > Math.PI) yaw -= TAU; else if (yaw < -Math.PI) yaw += TAU;
+      draw();
+      if (grow < 1 || flat !== flatTarget || spinning || drag) wake();
+    }
+
+    function wake() {
+      if (!raf) raf = requestAnimationFrame(frame);
+    }
+
+    function setHover(p: Point | null) {
+      if (p === hover) return;
+      hover = p;
+      if (p) {
+        nbrs = Array.from(D.nn.slice(p.i * K, p.i * K + K), (j) => pts[j]);
+        const n = nbrs.filter((q) => inGroup(q, group)).length;
+        const what = group === 0 ? S.owner[p.soe] : S.groups[p.board + 1];
+        readout.textContent = S.readout
+          .replace('{code}', p.code).replace('{what}', what)
+          .replace('{n}', String(n)).replace('{k}', String(K))
+          .replace('{group}', S.groupPhrase[group]);
+      } else {
+        readout.textContent = S.hint;
+      }
+      wake();
+    }
+
+    function pick(e: PointerEvent) {
+      if (grow < 1 || flat !== flatTarget) return;
+      const box = cv.getBoundingClientRect();
+      const mx = e.clientX - box.left, my = e.clientY - box.top;
+      let best: Point | null = null, score = Infinity;
+      for (const p of pts) {
+        const d2 = (p.sx - mx) ** 2 + (p.sy - my) ** 2;
+        if (d2 >= PICK_RADIUS ** 2) continue;
+        const sc = d2 + (p.d + 1) * 90; // prefer points nearer the viewer
+        if (sc < score) { score = sc; best = p; }
+      }
+      setHover(best);
+    }
+
+    cv.addEventListener('pointerdown', (e) => {
+      if (flatTarget === 1) return pick(e);
+      drag = { x: e.clientX, y: e.clientY, yaw, pitch };
+      cv.setPointerCapture(e.pointerId);
+      cv.classList.add('is-dragging');
+      setHover(null);
+    });
+    cv.addEventListener('pointermove', (e) => {
+      if (!drag) return pick(e);
+      yaw = drag.yaw + (e.clientX - drag.x) * 0.006;
+      pitch = Math.max(-1.3, Math.min(1.3, drag.pitch + (e.clientY - drag.y) * 0.006));
+      wake();
+    });
+    cv.addEventListener('pointerup', (e) => {
+      const tapped = drag && Math.abs(e.clientX - drag.x) + Math.abs(e.clientY - drag.y) < 5;
+      drag = null;
+      cv.classList.remove('is-dragging');
+      if (tapped) pick(e);
+      wake();
+    });
+    cv.addEventListener('pointercancel', () => { drag = null; cv.classList.remove('is-dragging'); wake(); });
+    cv.addEventListener('pointerleave', (e) => { if (!drag && e.pointerType === 'mouse') setHover(null); });
+
+    const press = (buttons: NodeListOf<HTMLButtonElement>, active: HTMLButtonElement) =>
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === active)));
+
+    const groupButtons = root.querySelectorAll<HTMLButtonElement>('button[data-group]');
+    groupButtons.forEach((btn) => btn.addEventListener('click', () => {
+      group = +btn.dataset.group!;
+      mark();
+      press(groupButtons, btn);
+      setHover(null);
+      wake();
+    }));
+
+    const viewButtons = root.querySelectorAll<HTMLButtonElement>('button[data-view]');
+    viewButtons.forEach((btn) => btn.addEventListener('click', () => {
+      flatTarget = btn.dataset.view === '2' ? 1 : 0;
+      press(viewButtons, btn);
+      cv.classList.toggle('is-flat', flatTarget === 1);
+      rotateHint.hidden = flatTarget === 1;
+      setHover(null);
+      wake();
+    }));
+
+    document.addEventListener('themechange', () => { readColors(); wake(); });
+    new IntersectionObserver(([entry]) => { seen = entry.isIntersecting; if (seen) wake(); }).observe(cv);
+    new ResizeObserver(size).observe(cv);
+    size();
+  }
+
+  const root = document.querySelector<HTMLElement>('[data-embedding-map]');
+  if (root) {
+    fetch(root.dataset.src!)
+      .then((res) => res.json())
+      .then((data: MapData) => init(root, data))
+      .catch(() => { root.querySelector<HTMLElement>('.legend')!.hidden = true; });
+  }
+</script>

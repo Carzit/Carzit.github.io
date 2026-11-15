@@ -1,11 +1,11 @@
-@import 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600;700&display=swap';
 @import 'tailwindcss';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --font-sans: 'Inter', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-serif: 'Source Serif 4', 'Noto Serif SC', 'Songti SC', 'Source Han Serif SC', SimSun, serif;
+  --font-sans: 'Source Sans 3', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', Consolas, monospace;
 
   --color-bg-primary: var(--bg-primary);
   --color-bg-secondary: var(--bg-secondary);
@@ -17,140 +17,83 @@
 }
 
 :root {
-  --bg-primary: #FAFAFA;
-  --bg-secondary: #F0F0F0;
-  --text-primary: #1A1A2E;
-  --text-secondary: #6B7280;
-  --accent: #2563EB;
-  --accent-hover: #1D4ED8;
-  --border: #E5E7EB;
+  --bg-primary: #f3f4f1;
+  --bg-secondary: #e8e9e5;
+  --text-primary: #14181c;
+  --text-secondary: #5d646b;
+  --accent: #e03a1e;
+  --accent-hover: #b82c14;
+  --border: #cfd2cd;
+}
+
+:root {
+  /* Page gutter, and the distance from the viewport edge to the content column. */
+  --gutter: 1rem;
+  --edge: max(var(--gutter), calc((100vw - 96rem) / 2 + var(--gutter)));
+
+  @media (width >= 40rem) {
+    --gutter: 2rem;
+  }
+  @media (width >= 64rem) {
+    --gutter: 3rem;
+  }
 }
 
 .dark {
-  --bg-primary: #0F0F1A;
-  --bg-secondary: #1A1A2E;
-  --text-primary: #E5E7EB;
-  --text-secondary: #9CA3AF;
-  --accent: #60A5FA;
-  --accent-hover: #93C5FD;
-  --border: #2D2D44;
-}
-
-html {
-  scroll-behavior: smooth;
+  --bg-primary: #101214;
+  --bg-secondary: #191c1f;
+  --text-primary: #e8e8e3;
+  --text-secondary: #969ca2;
+  --accent: #ff5a3c;
+  --accent-hover: #ff8169;
+  --border: #2b2f34;
 }
 
 body {
-  font-family: var(--font-sans);
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  font-optical-sizing: auto;
   background-color: var(--bg-primary);
   color: var(--text-primary);
-}
-
-/* Smooth theme transitions */
-body,
-body *:not(.astro-code):not(.astro-code *):not([data-no-transition]) {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
   background-color: var(--accent);
-  color: white;
+  color: #fff;
 }
 
-/* ── Page-load animation (immediate, for hero elements) ── */
-@keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 
-.animate-fade-in-up {
-  animation: fade-in-up 0.6s ease-out both;
-}
-
-.animation-delay-100 { animation-delay: 0.1s; }
-.animation-delay-200 { animation-delay: 0.2s; }
-.animation-delay-300 { animation-delay: 0.3s; }
-.animation-delay-400 { animation-delay: 0.4s; }
-.animation-delay-500 { animation-delay: 0.5s; }
-
-/* ── Scroll-triggered animations ── */
-[data-animate] {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-}
-
-[data-animate].is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-[data-animate][data-delay="100"] { transition-delay: 0.1s; }
-[data-animate][data-delay="200"] { transition-delay: 0.2s; }
-[data-animate][data-delay="300"] { transition-delay: 0.3s; }
-[data-animate][data-delay="400"] { transition-delay: 0.4s; }
-
-/* ── Header scroll state ── */
-#site-header {
-  border-bottom-color: transparent;
-  background-color: transparent;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  transition: background-color 0.3s ease, border-color 0.3s ease, backdrop-filter 0.3s ease;
-}
-
-#site-header.scrolled {
-  border-bottom-color: var(--border);
-  background-color: color-mix(in srgb, var(--bg-primary) 80%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-/* ── Mobile menu slide animation ── */
-.mobile-menu-inner {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.3s ease-out;
-}
-
-.mobile-menu-inner.is-open {
-  grid-template-rows: 1fr;
-}
-
-/* ── Animated link underlines ── */
-.link-underline {
-  position: relative;
-  text-decoration: none;
-}
-
-.link-underline::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: -1px;
-  width: 0;
-  height: 1px;
-  background-color: var(--accent);
-  transition: width 0.3s ease;
-}
-
-.link-underline:hover::after {
+/* The content column shared by every page. */
+@utility shell {
   width: 100%;
+  max-width: 96rem;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
 }
 
-/* ── Button press feedback ── */
-.btn-press {
-  transition: transform 0.15s ease, background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+/* Small sans-serif text for labels, captions and metadata. */
+@utility label {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
 }
 
-.btn-press:active {
-  transform: scale(0.97);
+/* Text link: ink-coloured, with an accent underline. */
+@utility link {
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+  &:hover {
+    color: var(--accent);
+  }
 }
 
 /* Blog prose styles */

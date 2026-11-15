@@ -1,0 +1,31 @@
+---
+import PaperList from '@components/PaperList.astro';
+import { t, type Locale } from '@i18n/utils';
+import PageLayout from '@layouts/PageLayout.astro';
+import { getPapers } from '@lib/research';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const strings = t(locale).research;
+const papers = await getPapers(locale);
+
+const sections = [
+  { heading: strings.workingPapers, papers: papers.filter((p) => p.data.status !== 'in-progress') },
+  { heading: strings.inProgress, papers: papers.filter((p) => p.data.status === 'in-progress') },
+].filter((section) => section.papers.length > 0);
+---
+
+<PageLayout title={strings.title} description={strings.intro}>
+  <p class="-mt-4 mb-12 max-w-[40rem] text-xl text-text-secondary md:-mt-6 md:mb-16">{strings.intro}</p>
+  {sections.map((section) => (
+    <section class="mb-12">
+      <h2 class="label mb-4 font-medium uppercase tracking-[0.12em] text-text-secondary">
+        {section.heading}
+      </h2>
+      <PaperList papers={section.papers} locale={locale} abstracts />
+    </section>
+  ))}
+</PageLayout>

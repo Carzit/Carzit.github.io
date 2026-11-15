@@ -1,0 +1,45 @@
+---
+import { getLocalePath, t, type Locale } from '@i18n/utils';
+import PageLayout from '@layouts/PageLayout.astro';
+import { CV_PDF } from '@lib/constants';
+import { CV } from '@lib/profile';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const strings = t(locale);
+---
+
+<PageLayout title={strings.cv.title} description={`${strings.cv.title} · ${strings.home.name}`}>
+  <p class="label -mt-4 mb-12 flex flex-wrap gap-x-6 gap-y-1 md:-mt-6 md:mb-16">
+    <a href={CV_PDF} class="link">{strings.cv.download}</a>
+    <span class="text-text-secondary">
+      {strings.cv.papers}
+      <a href={getLocalePath('/research', locale)} class="link text-text-primary">{strings.research.title}</a>
+    </span>
+  </p>
+
+  {CV[locale].map((section) => (
+    <section class="mb-12">
+      <h2 class="label mb-4 font-medium uppercase tracking-[0.12em] text-text-secondary">
+        {section.heading}
+      </h2>
+      {section.entries.map((entry) => (
+        <div class="grid gap-x-12 gap-y-1 border-t border-border py-5 md:grid-cols-[11rem_1fr]">
+          <p class="label tabular-nums text-text-secondary md:pt-1">{entry.label}</p>
+          <div class="max-w-[44rem]">
+            <h3 class:list={[entry.organization && 'text-xl font-medium leading-snug tracking-tight']}>
+              {entry.title}
+            </h3>
+            {entry.organization && <p>{entry.organization}</p>}
+            {entry.details?.map((detail) => (
+              <p class="mt-2 text-[0.975rem] text-text-secondary">{detail}</p>
+            ))}
+          </div>
+        </div>
+      ))}
+    </section>
+  ))}
+</PageLayout>

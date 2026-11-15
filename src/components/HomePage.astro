@@ -1,0 +1,62 @@
+---
+import EmbeddingMap from '@components/EmbeddingMap.astro';
+import PaperList from '@components/PaperList.astro';
+import { getLocalePath, t, type Locale } from '@i18n/utils';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { SITE, SOCIAL } from '@lib/constants';
+import { getPapers } from '@lib/research';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const strings = t(locale);
+const isZh = locale === 'zh';
+const papers = await getPapers(locale);
+---
+
+<BaseLayout
+  title={`${strings.home.name} · ${strings.home.title}`}
+  description={isZh ? SITE.descriptionZh : SITE.description}
+  overlayHeader
+>
+  <EmbeddingMap locale={locale}>
+    <div
+      class="pointer-events-none px-[var(--gutter)] pb-6 lg:absolute lg:bottom-[7vh] lg:left-[var(--edge)] lg:w-[27rem] lg:p-0 [&_a]:pointer-events-auto"
+      data-intro
+    >
+      <p class="label mb-4 text-text-secondary">{strings.home.where}</p>
+      <h1
+        class:list={[
+          'font-medium',
+          isZh
+            ? 'text-[clamp(3.5rem,8vw,6rem)] leading-none tracking-[0.06em]'
+            : 'text-[clamp(3.75rem,9vw,7.25rem)] leading-[0.86] tracking-[-0.035em]',
+        ]}
+      >
+        {isZh ? strings.home.name : <>Zitong<br />Cheng</>}
+      </h1>
+      <p
+        lang={isZh ? 'en' : 'zh-CN'}
+        class:list={['mt-4 text-xl', isZh ? 'italic' : 'tracking-[0.35em]']}
+      >
+        {strings.home.otherName}
+      </p>
+      <p class="mb-5 mt-6 max-w-[25rem] text-pretty">{strings.home.lede}</p>
+      <p class="label flex flex-wrap gap-x-5 gap-y-1">
+        <a href={`mailto:${SOCIAL.email}`} class="link">{SOCIAL.email}</a>
+        <a href={SOCIAL.github} class="link">GitHub</a>
+        <a href={SOCIAL.googleScholar} class="link">Scholar</a>
+      </p>
+    </div>
+  </EmbeddingMap>
+
+  <section class="shell pb-20 pt-14 md:pt-20">
+    <div class="label mb-4 flex items-baseline justify-between text-text-secondary">
+      <h2 class="font-medium uppercase tracking-[0.12em]">{strings.research.title}</h2>
+      <a href={getLocalePath('/research', locale)} class="link">{strings.home.allResearch}</a>
+    </div>
+    <PaperList papers={papers} locale={locale} />
+  </section>
+</BaseLayout>

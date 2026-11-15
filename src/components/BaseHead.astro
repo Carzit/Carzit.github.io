@@ -1,15 +1,19 @@
 ---
 import 'katex/dist/katex.min.css';
-import { ViewTransitions } from 'astro:transitions';
 
 interface Props {
   title: string;
   description: string;
-  ogImage?: string;
 }
 
-const { title, description, ogImage = '/images/og-image.png' } = Astro.props;
+const { title, description } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const fonts = 'https://fonts.googleapis.com/css2'
+  + '?family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400'
+  + '&family=Source+Sans+3:wght@400;500;600'
+  + '&family=Noto+Serif+SC:wght@400;600'
+  + '&family=Noto+Sans+SC:wght@400;500'
+  + '&display=swap';
 ---
 
 <meta charset="utf-8" />
@@ -19,6 +23,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 <link rel="canonical" href={canonicalURL} />
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="sitemap" href="/sitemap-index.xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href={fonts} />
 
 <title>{title}</title>
 <meta name="description" content={description} />
@@ -27,20 +34,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 <meta property="og:url" content={canonicalURL} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-<meta property="og:image" content={new URL(ogImage, Astro.site)} />
-
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content={title} />
-<meta name="twitter:description" content={description} />
-<meta name="twitter:image" content={new URL(ogImage, Astro.site)} />
-
-<ViewTransitions />
-
-<noscript>
-  <style>
-    [data-animate] { opacity: 1 !important; transform: none !important; }
-  </style>
-</noscript>
+<meta name="twitter:card" content="summary" />
 
 <script is:inline>
   const theme = (() => {

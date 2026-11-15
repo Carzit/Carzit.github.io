@@ -1,14 +1,17 @@
 ---
-title: "Time-varying Asset Embeddings in China"
-authors: ["Zitong Cheng", "Xiaobin Liu", "Dashan Huang"]
-venue: "Management Science"
-year: 2025
+title: "Do Asset Embeddings Need Complete Holdings? Lessons from China"
+authors: ["Zitong Cheng", "Dashan Huang", "Xiaobin Liu", "Tao Zeng"]
 status: "revision"
-tags: ["Representation Learning", "NLP", "Asset Pricing", "BERT"]
-links: []
-featured: true
+statusLabel: "R&R (minor revision), Management Science"
+finding: "Embeddings estimated from partial institutional holdings still work in the A-share market, and identify state-owned enterprises more accurately than firm characteristics do."
+links:
+  - label: "SSRN"
+    url: "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7690818"
+  - label: "Data (Zenodo)"
+    url: "https://zenodo.org/records/20712455"
+  - label: "Code (GitHub)"
+    url: "https://github.com/Initial-Singularity/AssetEmbeddingsInChina"
 order: 1
-draft: true
 ---
 
-This paper applies NLP and representation learning to model financial assets from mutual fund holdings data. We model institutional portfolios as "documents" and stocks as "tokens," applying Word2Vec, Recommender System, and BERT-based embedding models (AssetBERT) to capture cross-asset relationships and investor behavior patterns. A quarterly fine-tuning workflow is designed to address temporal dynamics: base models trained on historical data are adapted to each quarter's holdings without look-ahead bias, outperforming static embedding approaches. Contextual embeddings (AssetBERT) achieve 15–25% higher predictive power than traditional firm-characteristic models across valuation accuracy, return comovement, and portfolio-level tests.
+We examine whether the holdings-based asset embeddings of Gabaix et al. (2025) work in China's A-share market, where only institutional holdings are available, disclosure is often partial, and short selling is negligible. Estimating Word2Vec and BERT with a pretrain-finetune paradigm and warm-starting BERT from Word2Vec embeddings, we find that BERT-based embeddings perform best on relative valuation and return comovement at high dimensions and on managed portfolios at every dimension, and that asset embeddings outperform text embeddings and align more closely with investor demand. The embeddings also capture China-specific features: they identify state-owned enterprises more accurately than firm characteristics, and their implied state exposures carry return information beyond the legal SOE label during the 2024Q1 SOE re-rating campaign.

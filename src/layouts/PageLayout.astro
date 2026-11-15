@@ -5,17 +5,15 @@ interface Props {
   title: string;
   description: string;
   heading?: string;
-  ogImage?: string;
 }
 
-const { title, description, heading, ogImage } = Astro.props;
-const displayHeading = heading ?? title;
+const { title, description, heading } = Astro.props;
 ---
 
-<BaseLayout title={title} description={description} ogImage={ogImage}>
-  <div class="mx-auto max-w-4xl px-4 py-12 md:px-6 md:py-16">
-    <h1 class="mb-8 text-3xl font-bold text-text-primary md:text-4xl" data-animate>
-      {displayHeading}
+<BaseLayout title={title} description={description}>
+  <div class="shell pb-20 pt-10 md:pt-16">
+    <h1 class="mb-10 text-4xl font-medium leading-none tracking-tight md:mb-14 md:text-6xl">
+      {heading ?? title}
     </h1>
     <slot />
   </div>
