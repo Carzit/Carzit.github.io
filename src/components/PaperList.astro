@@ -13,6 +13,14 @@ interface Props {
 const { papers, locale, abstracts = false } = Astro.props;
 const strings = t(locale).research;
 
+// Split a title into lines at the optional `titleBreakAfter` phrase.
+const titleLines = (title: string, breakAfter?: string) => {
+  const at = breakAfter ? title.indexOf(breakAfter) : -1;
+  if (at < 0) return [title];
+  const end = at + breakAfter!.length;
+  return [title.slice(0, end), title.slice(end).trim()];
+};
+
 const items = await Promise.all(
   papers.map(async (entry) => ({
     data: entry.data,
@@ -27,8 +35,16 @@ const items = await Promise.all(
   {items.map(({ data, coauthors, Content }) => (
     <article class="grid gap-x-12 gap-y-3 border-t border-border py-6 md:grid-cols-[1fr_16rem] md:py-7">
       <div>
-        <h3 class="text-balance text-xl font-medium leading-tight tracking-tight md:text-[1.6rem]">
-          {data.title}
+        {/* The width cap makes long titles wrap on wide screens instead of running as one line. */}
+        <h3 class="max-w-[50rem] text-xl font-medium leading-tight tracking-tight md:text-[1.6rem]">
+          {titleLines(data.title, data.titleBreakAfter).map((line) => (
+            <span class="block text-balance">
+              {line.split(' ').map((word) => (
+                // Keep hyphenated compounds such as "Finite-Time" on one line.
+                word.includes('-') ? <><span class="whitespace-nowrap">{word}</span>{' '}</> : `${word} `
+              ))}
+            </span>
+          ))}
         </h3>
         {data.finding && <p class="mt-2 max-w-[40rem] text-text-secondary">{data.finding}</p>}
         {Content && (
